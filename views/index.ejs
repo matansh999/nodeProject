@@ -30,8 +30,13 @@
       var elemTop = canvas.offsetTop + canvas.clientTop;
       var elements = [];
       
+      
       const x = 7
       const y = 7
+
+      var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
+      var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
+      
       document.getElementById("myCanvas",(canvas)=>
         {
           console.log("<-!->")
@@ -91,8 +96,6 @@ function draw()
 {
   ctx.fillStyle = "black"
   ctx.fillRect(0,0,canvas.width,canvas.height)
-  var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
-  var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
   let elementCount=0;
   elements.forEach(function(element) {
     ctx.beginPath();
@@ -104,35 +107,40 @@ function draw()
 
 
   ctx.beginPath()
-    ctx.moveTo(w,(b*8.5))
-    ctx.lineTo(w*1.25,(b*8))
-    ctx.lineTo(w*1.5,(b*8.5))
-    ctx.fill()
-  for (let i =0;i<6;i++)
+  ctx.moveTo(w,(b*8.5))
+  ctx.lineTo((w*1.25)*(1),(b*8))
+  ctx.lineTo(w*1.5,(b*8.5))
+  ctx.fill()
+  for (let i =1;i<7;i++)
   {
+    console.log("x1:"+((w*1.25)*(i+1)-(w*1.25-w) )+' y1:'+(b*8.5)+' x2:'+(w*1.25)*(i+1)+" y2:"+ (b*8))
     if(i==0)
     {
       var dis = (w*1.75)*(i+1) - (w*1.5)*(i+1);
     }
     ctx.beginPath()
-    ctx.moveTo((((w/9)*(i+2)))*(10),(b*8.5))
-    ctx.lineTo((((w/9)*(i+2)))*(10)+dis,(b*8))
-    ctx.lineTo((((w/9)*(i+2)))*(10)+2*dis,(b*8.5))
+    ctx.moveTo((w*1.25)*(i+1)-(w*1.25-w),(b*8.5))
+    ctx.lineTo((w*1.25)*(i+1),(b*8))
+    ctx.lineTo((w*1.25)*(i+1)+(w*1.25-w),(b*8.5))
+    //console.log(w*(i+1) + " " + w*(i+1)+(w*1.5-w)+" "+(w*(i+1)+(w*1.5-w)-w*(i+1)))
     ctx.fill()
     
-    console.log(" i: " + (i+1), " 1: " + ((((w/9)*(i+2)))*(10)) + " 2: " + ((((w/9)*(i+2)))*(10)+dis) + " 3: " +((((w/9)*(i+2)))*(10)+2*dis) +  " w = " + w + " dis: " + dis+" w/9: "+ w/9)
+    //console.log(" i: " + (i+1), " 1: " + ((((w/9)*(i+2)))*(10)) + " 2: " + ((((w/9)*(i+2)))*(10)+dis) + " 3: " +((((w/9)*(i+2)))*(10)+2*dis) +  " w = " + w + " dis: " + dis+" w/9: "+ w/9)
   }
 }  
 
 // " 1: " + w*1.25*(i+1) + " 2: " + (w*1.5)*(i+1) + " 3: " +(w*1.75)*(i+1) +  " w = " + w 
 
-function click()
+
+function func(x,y)
 {
+  //use w to find the range and with that u check on what tringle the click is on 
+  //and then check the function to find if the click is on the tringle
 }
 
-
 // Add event listener for `click` events.
-canvas.addEventListener('click',function(event){
+canvas.addEventListener('click',function(event)
+{
   console.log(elements)
   var choose = false
   var i = 0, target
@@ -142,9 +150,10 @@ canvas.addEventListener('click',function(event){
   // Collision detection between clicked offset and element.
   elements.forEach(function(element) {
       if (y > element.top && y < element.top + element.height 
-          && x > element.left && x < element.left + element.width) {
-            choose = true
-            target = i
+          && x > element.left && x < element.left + element.width) 
+      {
+        choose = true
+        target = i
       }
       i++
   });
