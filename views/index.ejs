@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Connect four</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+      
+      .selector{
+        margin-left: 2.6%;
+        width: 3%;
+        background-color: black;
+        height: 5px;
+      }
+      #firstBtn{
+        margin-left: 3.9%;      
+}
+    </style>
+  </head>
+  <body onload ="load()">
+    
+    <div>
+      <canvas id="myCanvas" ></canvas>
+      
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script>
+      const canvas = document.getElementById('myCanvas');                         
+      const ctx = canvas.getContext('2d');
+      var elemLeft = canvas.offsetLeft + canvas.clientLeft;
+      var elemTop = canvas.offsetTop + canvas.clientTop;
+      var elements = [];
+      
+      const x = 7
+      const y = 7
+      document.getElementById("myCanvas",(canvas)=>
+        {
+          console.log("<-!->")
+          canvas.width=window.innerWidth;
+          canvas.height=window.innerHeight;
+        })
+      function load(){
+        document.getElementById("myCanvas").width=window.innerWidth/2;
+        document.getElementById("myCanvas").height=document.getElementById("myCanvas").width/1.5;
+        draw();
+        var Btns=document.getElementsByClassName('selector');
+        for(let i=0; i<Btns.length;i++){
+          Btns[i].size=window.innerWidth/2
+        }
+      }
+          
+      window.addEventListener('resize',()=>
+      {
+        document.getElementById("myCanvas").width=window.innerWidth/2;
+        document.getElementById("myCanvas").height=document.getElementById("myCanvas").width/1.5;
+        draw();        
+      },false)
+
+
+      
+
+
+    for (var j=0;j<x*y;j++){
+      elements.push({
+        color: '#05EFFF',
+        player: "none",
+        neighborLeft:0,
+        neighborRight:0,
+        neighborLeftUp:0,
+        neighborLeftDown:0,
+        neighborRightUp:0,
+        neighborRightDown:0,
+        neighborDown:0
+      });
+    }
+
+
+
+    for (let jj=0;jj<6 ;jj++)
+    {
+      elements.push({
+        color:'#red',
+        top:(canvas.height/7)*6,
+        left:canvas.width/9
+      })
+    }
+
+
+
+
+function draw()
+{
+  ctx.fillStyle = "black"
+  ctx.fillRect(0,0,canvas.width,canvas.height)
+  var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
+  var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
+  let elementCount=0;
+  elements.forEach(function(element) {
+    ctx.beginPath();
+    ctx.arc((w*1.25)*((elementCount%7)+1),(Math.floor(elementCount/8)+1)*(b),w/5,0,2 * Math.PI);
+    ctx.fillStyle = element.color;
+    ctx.fill()
+    elementCount++;
+  });
+
+
+  ctx.beginPath()
+    ctx.moveTo(w,(b*8.5))
+    ctx.lineTo(w*1.25,(b*8))
+    ctx.lineTo(w*1.5,(b*8.5))
+    ctx.fill()
+  for (let i =0;i<6;i++)
+  {
+    if(i==0)
+    {
+      var dis = (w*1.75)*(i+1) - (w*1.5)*(i+1);
+    }
+    ctx.beginPath()
+    ctx.moveTo((((w/9)*(i+2)))*(10),(b*8.5))
+    ctx.lineTo((((w/9)*(i+2)))*(10)+dis,(b*8))
+    ctx.lineTo((((w/9)*(i+2)))*(10)+2*dis,(b*8.5))
+    ctx.fill()
+    
+    console.log(" i: " + (i+1), " 1: " + ((((w/9)*(i+2)))*(10)) + " 2: " + ((((w/9)*(i+2)))*(10)+dis) + " 3: " +((((w/9)*(i+2)))*(10)+2*dis) +  " w = " + w + " dis: " + dis+" w/9: "+ w/9)
+  }
+}  
+
+// " 1: " + w*1.25*(i+1) + " 2: " + (w*1.5)*(i+1) + " 3: " +(w*1.75)*(i+1) +  " w = " + w 
+
+function click()
+{
+}
+
+
+// Add event listener for `click` events.
+canvas.addEventListener('click',function(event){
+  console.log(elements)
+  var choose = false
+  var i = 0, target
+  var x = event.pageX  - elemLeft,
+      y = event.pageY  - elemTop;
+  console.log("x =  ",x,"y =  ",y)
+  // Collision detection between clicked offset and element.
+  elements.forEach(function(element) {
+      if (y > element.top && y < element.top + element.height 
+          && x > element.left && x < element.left + element.width) {
+            choose = true
+            target = i
+      }
+      i++
+  });
+  if (choose)
+  {
+    choose=false
+    console.log(elements[target])
+    if (elements[target].color=='#05EFFF')
+    {
+      elements[target].color="red"
+    }
+    else
+    {
+      elements[target].color='#05EFFF'
+    }
+    console.log(elements[target])
+    draw()
+  }
+},false,)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      var socket = io();
+    
+      var messages = document.getElementById('messages');
+      var form = document.getElementById('form');
+      var input = document.getElementById('input');
+    
+      
+      socket.on('chat message', function(msg) {
+        var item = document.createElement('li');
+        item.textContent = msg;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      draw();
+    </script>
+  </body>
+</html>
