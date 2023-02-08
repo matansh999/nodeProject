@@ -148,6 +148,7 @@ canvas.addEventListener('click',function(event){
         if(elements[p][btn.col].player==0)
         {
           elements[p][btn.col].player=player
+          break;
         }
       }
     }
@@ -214,20 +215,53 @@ canvas.addEventListener('click',function(event){
 
       function checkNeighbor(i,j,circ)
       {
-        if(elements[i-1][j].player==circ.player){
+        if(i>0&&elements[i-1][j].player==circ.player){
           circ.neighborDown=elements[i-1][j].neighborDown+1
           if(circ.neighborDown==4){
             win()
           }
         }
+        
+        if(j>0&&elements[i][j-1].player==circ.player){
+          circ.neighborLeft=elements[i][j-1].neighborLeft+1
+          if(circ.neighborLeft==4){
+            win()
+          }
+        }
 
-        switch(circ){
-          case elements[i-1][j].player==circ.player:
-            circ.neighborDown=elements[i-1][j].neighborDown+1
-            if(circ.neighborDown==4){
-              win()
-            }
-            break;
+        if(j<6&&elements[i][j+1].player==circ.player){
+          circ.neighborRight=elements[i][j+1].neighborRight+1
+          if(circ.neighborRight==4){
+            win()
+          }
+        }
+
+        if(i>0&&j>0&&elements[i-1][j-1].player==circ.player){
+          circ.neighborLeftDown=elements[i-1][j-1].neighborLeftDown+1
+          if(circ.neighborLeftDown==4){
+            win()
+          }
+        }
+        
+        if(i<6&&j>0&&elements[i+1][j-1].player==circ.player){
+          circ.neighborLeftUp=elements[i+1][j-1].neighborLeftUp+1
+          if(circ.neighborLeftUp==4){
+            win()
+          }
+        }
+
+        if(i>0&&j>0&&elements[i+1][j+1].player==circ.player){
+          circ.neighborRightUp=elements[i+1][j+1].neighborRightUp+1
+          if(circ.neighborRightUp==4){
+            win()
+          }
+        }
+
+        if(i>0&&j>0&&elements[i-1][j+1].player==circ.player){
+          circ.neighborRightDown=elements[i-1][j+1].neighborRightDown+1
+          if(circ.neighborRightDown==4){
+            win()
+          }
         }
       }
 function win()
