@@ -29,14 +29,10 @@
       var elemLeft = canvas.offsetLeft + canvas.clientLeft;
       var elemTop = canvas.offsetTop + canvas.clientTop;
       var elements = [];
-      
+      var btnArr = [];
       
       const x = 7
       const y = 7
-
-      var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
-      var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
-      
       document.getElementById("myCanvas",(canvas)=>
         {
           console.log("<-!->")
@@ -64,18 +60,21 @@
       
 
 
-    for (var j=0;j<x*y;j++){
-      elements.push({
-        color: '#05EFFF',
-        player: "none",
-        neighborLeft:0,
-        neighborRight:0,
-        neighborLeftUp:0,
-        neighborLeftDown:0,
-        neighborRightUp:0,
-        neighborRightDown:0,
-        neighborDown:0
-      });
+    for (var j=0;j<x;j++){
+      for(let k=0;k<y;k++)
+      { 
+        elements.push({
+          color: '#05EFFF',
+          player: 0,
+          neighborLeft:0,
+          neighborRight:0,
+          neighborLeftUp:0,
+          neighborLeftDown:0,
+          neighborRightUp:0,
+          neighborRightDown:0,
+          neighborDown:0
+        });
+      }
     }
 
 
@@ -96,6 +95,8 @@ function draw()
 {
   ctx.fillStyle = "black"
   ctx.fillRect(0,0,canvas.width,canvas.height)
+  var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
+  var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
   let elementCount=0;
   elements.forEach(function(element) {
     ctx.beginPath();
@@ -104,27 +105,22 @@ function draw()
     ctx.fill()
     elementCount++;
   });
-
-
   ctx.beginPath()
-  ctx.moveTo(w,(b*8.5))
-  ctx.lineTo((w*1.25)*(1),(b*8))
-  ctx.lineTo(w*1.5,(b*8.5))
-  ctx.fill()
-  for (let i =1;i<7;i++)
-  {
-    console.log("x1:"+((w*1.25)*(i+1)-(w*1.25-w) )+' y1:'+(b*8.5)+' x2:'+(w*1.25)*(i+1)+" y2:"+ (b*8))
-    if(i==0)
-    {
-      var dis = (w*1.75)*(i+1) - (w*1.5)*(i+1);
-    }
-    ctx.beginPath()
-    ctx.moveTo((w*1.25)*(i+1)-(w*1.25-w),(b*8.5))
-    ctx.lineTo((w*1.25)*(i+1),(b*8))
-    ctx.lineTo((w*1.25)*(i+1)+(w*1.25-w),(b*8.5))
-    //console.log(w*(i+1) + " " + w*(i+1)+(w*1.5-w)+" "+(w*(i+1)+(w*1.5-w)-w*(i+1)))
+    ctx.moveTo(w,(b*8.5))
+    ctx.lineTo(w*1.25,(b*8))
+    ctx.lineTo(w*1.5,(b*8.5))
     ctx.fill()
-    
+  for (let i =0;i<7;i++)
+  {
+    let topPoint=(w*1.25)*(i+1)
+    let rightPoint=(w*1.25)*(i+1)+(w*1.25-w)
+    let leftPoint=(w*1.25)*(i+1)-(w*1.25-w)
+    ctx.beginPath()
+    ctx.moveTo(rightPoint,(b*8.5))
+    ctx.lineTo(topPoint,(b*8))
+    ctx.lineTo(leftPoint,(b*8.5))
+    ctx.fill()
+    btnArr[i]={"col":i,"topPoint":topPoint,"rightPoint":rightPoint,"leftPoint":leftPoint,"lowY":b*8,"heighY":b*8.5}
     //console.log(" i: " + (i+1), " 1: " + ((((w/9)*(i+2)))*(10)) + " 2: " + ((((w/9)*(i+2)))*(10)+dis) + " 3: " +((((w/9)*(i+2)))*(10)+2*dis) +  " w = " + w + " dis: " + dis+" w/9: "+ w/9)
   }
 }  
@@ -132,31 +128,37 @@ function draw()
 // " 1: " + w*1.25*(i+1) + " 2: " + (w*1.5)*(i+1) + " 3: " +(w*1.75)*(i+1) +  " w = " + w 
 
 
-function func(x,y)
-{
-  //use w to find the range and with that u check on what tringle the click is on 
-  //and then check the function to find if the click is on the tringle
-}
 
 // Add event listener for `click` events.
-canvas.addEventListener('click',function(event)
-{
-  console.log(elements)
+canvas.addEventListener('click',function(event){
+  console.log(btnArr)
   var choose = false
   var i = 0, target
   var x = event.pageX  - elemLeft,
       y = event.pageY  - elemTop;
   console.log("x =  ",x,"y =  ",y)
   // Collision detection between clicked offset and element.
-  elements.forEach(function(element) {
-      if (y > element.top && y < element.top + element.height 
-          && x > element.left && x < element.left + element.width) 
+  const slope = (btnArr[1].heighY-btnArr[1].lowY)/(btnArr[1].topPoint-btnArr[1].leftPoint)
+  console.log(slope)
+  btnArr.forEach(function(btn) {
+    if((x<=btn.rightPoint&&x>=btn.topPoint)&&(y<=slope*(x-btn.topPoint)+btn.heighY&&(y>=btn.lowY)))
+    {
+      for(let p=6;p>0;p--)
       {
-        choose = true
-        target = i
+        if(elements[p][btn.col].player==0)
+        {
+          elements[p][btn.col].player=player
+        }
       }
-      i++
+    }
+    else if( (x<=btn.topPoint&&x>=btn.leftPoint)&&(y<=((-slope)*(x-btn.topPoint)+btn.heighY))&&(y>=btn.lowY) )
+    {
+      console.log(btn)
+    }
   });
+
+  
+
   if (choose)
   {
     choose=false
@@ -205,6 +207,49 @@ canvas.addEventListener('click',function(event)
       });
 
       draw();
+
+
+
+
+
+      function checkNeighbor(i,j,circ)
+      {
+        if(elements[i-1][j].player==circ.player){
+          circ.neighborDown=elements[i-1][j].neighborDown+1
+          if(circ.neighborDown==4){
+            win()
+          }
+        }
+
+        switch(circ){
+          case elements[i-1][j].player==circ.player:
+            circ.neighborDown=elements[i-1][j].neighborDown+1
+            if(circ.neighborDown==4){
+              win()
+            }
+            break;
+        }
+      }
+function win()
+    {
+      console/*niGGGGa*/.log("winn ")
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
     </script>
   </body>
 </html>
