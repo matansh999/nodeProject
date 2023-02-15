@@ -15,11 +15,34 @@ app.get('/game', (req, res) => {
   res.render('game.ejs');
 });
 app.get('/', (req, res) => {
-  res.render('game');
+  res.render('index');
 });
+
+/*
+app.get('/game/:roomId', (req, res) => {
+  const roomId = req.params.roomId;
+  
+  
+  // Join the room.
+  const socket = io.sockets.connected[socket.id];
+  socket.join(roomId);
+  
+  // Redirect the user to the game page.
+  //res.redirect('/game');
+});
+*/
 
 io.on('connection', function(socket) {
   console.log('User connected with ID:', socket.id);
+    
+  socket.on('joinRoom', function(roomName) {
+    console.log(roomName)
+    socket.join(roomName);
+    socket.emit('roomJoined', roomName);
+  });
+  
+  
+  
   socket.emit("player",player);
   if(player=="red"){
     player="yellow"
@@ -27,14 +50,19 @@ io.on('connection', function(socket) {
   else{
     player="red"
   }
-  socket.on("enter",()=>{
+
+  socket.emit("turn","red");
+
+  io.on("enter",(room)=>{
+    console.log(player)
     if(player=="red"){
       player="yellow"
     }
     else{
       player="red"
     }
-    socket.emit("turn",player);
+    console.log(room)
+    io.in(room).emit("turn",player);
   })
 
 });

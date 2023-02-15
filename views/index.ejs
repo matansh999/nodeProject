@@ -11,31 +11,18 @@
         socket.emit("joinRoom", roomName);
       }
 
-      function createRoom() {
-        var roomName = document.getElementById("roomName").value;
-        socket.emit("createRoom", roomName);
-      }
-
       socket.on("roomJoined", function(roomName) {
         console.log("Joined room: " + roomName);
-        window.location="/room/"+roomName;
-      });
-
-      socket.on('moveRoom',url=>
-      {
-        window.location = url
-      });
-      socket.on("roomCreated", function(roomName) {
-        console.log("Created room: " + roomName);
+        window.location="game?room="+roomName;
       });
     </script>
   </head>
   <body>
     <h1>Socket.io Room Example</h1>
+
     <p>Enter a room name:</p>
     <input type="text" id="roomName">
     <br><br>
     <button onclick="joinRoom()">Join Room</button>
-    <button onclick="createRoom()">Create Room</button>
   </body>
 </html>

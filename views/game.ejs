@@ -30,7 +30,22 @@
       var elemTop = canvas.offsetTop + canvas.clientTop;
       var elements = [];
       var btnArr = [];
-      var player,turn;
+      var player, turn, room;
+      
+
+      var socket = io();
+      
+      socket.on('player', function(p) {
+        player=p;
+        console.log(player);
+      });
+      socket.on("turn",(p)=>{
+        turn=p;
+        console.log(p)
+      });
+      const params = new URL(document.location).searchParams;
+      room = params.get('room')
+
 
       const x = 7
       const y = 7
@@ -60,7 +75,7 @@
 
       
 
-
+      //circles
     for (var j=0;j<x;j++){
       for(let k=0;k<y;k++)
       { 
@@ -79,13 +94,13 @@
     }
 
 
-
+    //tringles
     for (let jj=0;jj<6 ;jj++)
     {
       elements.push({
         color:'#red',
         top:(canvas.height/7)*6,
-        left:canvas.width/9
+        left:canvas.width/9,
       })
     }
 
@@ -131,10 +146,14 @@ function draw()
 
 
 // Add event listener for `click` events.
+
+ 
 canvas.addEventListener('click',function(event){
-  console.log(turn)
-  if(turn==player){ 
-    console.log(btnArr)
+  console.log(turn + " " + player)
+  if(turn===player){
+    console.log(room)
+    socket.emit("enter",room);
+    //console.log(btnArr)
     var choose = false
     var i = 0, target
     var x = event.pageX  - elemLeft,
@@ -157,7 +176,7 @@ canvas.addEventListener('click',function(event){
       }
       else if( (x<=btn.topPoint&&x>=btn.leftPoint)&&(y<=((-slope)*(x-btn.topPoint)+btn.heighY))&&(y>=btn.lowY) )
       {
-        console.log(btn)
+        //console.log(btn)
       }
     });
 
@@ -169,18 +188,14 @@ canvas.addEventListener('click',function(event){
       console.log(elements[target])
       if (elements[target].color=='#05EFFF')
       {
-        elements[target].color="red"
-      }
-      else
-      {
-        elements[target].color='#05EFFF'
+        elements[target].color=player
       }
       console.log(elements[target])
       draw()
     }
-  }
-  socket.emit("enter");
-},false,)
+  
+}},false,)
+
 
       
 
@@ -197,17 +212,6 @@ canvas.addEventListener('click',function(event){
 
 
 
-
-      var socket = io();
-      
-      socket.on('player', function(p) {
-        player=p;
-        console.log(player);
-        
-      });
-      socket.on("turn",(p)=>{
-        turn=p;
-      });
 
       draw();
 
