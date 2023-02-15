@@ -19,8 +19,9 @@ router.get('/',function(req,res){
 }); 
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('User connected with ID:', socket.id);
 });
+
 
 router.post('/login',function(req,res){
   const { uname, passwd } = req.body;
@@ -46,6 +47,7 @@ app.use('/', router);
 server.listen(port,() => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${port}`); 
 });
+
 
 io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
