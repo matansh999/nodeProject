@@ -153,6 +153,7 @@ canvas.addEventListener('click',function(event){
   if(turn===player){
     console.log(room)
     socket.emit("enter",room);
+    socket.emit("endturn");
     //console.log(btnArr)
     var choose = false
     var i = 0, target
@@ -162,6 +163,7 @@ canvas.addEventListener('click',function(event){
     // Collision detection between clicked offset and element.
     const slope = (btnArr[1].heighY-btnArr[1].lowY)/(btnArr[1].topPoint-btnArr[1].leftPoint)
     //console.log(slope)
+    /*
     btnArr.forEach(function(btn) {
       if((x<=btn.rightPoint&&x>=btn.topPoint)&&(y<=slope*(x-btn.topPoint)+btn.heighY&&(y>=btn.lowY)))
       {
@@ -178,7 +180,7 @@ canvas.addEventListener('click',function(event){
       {
         //console.log(btn)
       }
-    });
+    });*/
 
     
 
