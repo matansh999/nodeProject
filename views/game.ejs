@@ -30,7 +30,7 @@
       var elemTop = canvas.offsetTop + canvas.clientTop;
       var elements = [];
       var btnArr = [];
-      var player, turn, room;
+      var player, turn="red", room;
       
 
       var socket = io();
@@ -43,6 +43,9 @@
         turn=p;
         console.log(p)
       });
+
+
+
       const params = new URL(document.location).searchParams;
       room = params.get('room')
 
@@ -151,10 +154,8 @@ function draw()
 canvas.addEventListener('click',function(event){
   console.log(turn + " " + player)
   if(turn===player){
-    console.log(room)
-    socket.emit("enter",room);
-    socket.emit("endturn");
-    //console.log(btnArr)
+    enturn()
+    console.log(btnArr)
     var choose = false
     var i = 0, target
     var x = event.pageX  - elemLeft,
@@ -205,7 +206,12 @@ canvas.addEventListener('click',function(event){
 
 
 
-
+function enturn()
+{
+  console.log(room)
+  socket.emit("enter",room);
+  //socket.emit("endturn");
+}
 
 
 

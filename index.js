@@ -7,7 +7,6 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 var player ="red";
-
 app.set('view engine', 'ejs');
 
 // Define a route for the game page.
@@ -32,16 +31,18 @@ app.get('/game/:roomId', (req, res) => {
 });
 */
 
-io.on('connection', function(socket) {
+io.on('connection', socket=>{
   console.log('User connected with ID:', socket.id);
   socket.on('joinRoom', function(roomName) {
     console.log(roomName)
     socket.join(roomName);
-    socket.emit('roomJoined', roomName);
+    socket.emit("roomJoined", roomName);
   });
   
+
   
-  socket.emit("player",player);
+  
+  socket.emit("player",(player));
   if(player=="red"){
     player="yellow"
   }
@@ -49,22 +50,23 @@ io.on('connection', function(socket) {
     player="red"
   }
 
-  socket.emit("turn","red");
+  
 
-  io.on("enter",(room)=>{
-    console.log(player)
+  socket.on("enter",(room)=>{
     if(player=="red"){
       player="yellow"
     }
     else{
       player="red"
     }
+    console.log(player)
     console.log(room)
     io.to(room).emit("turn",player);
   })
 
-  io.on("endturn", function(socket){
+  /*socket.on("endturn", function(socket){
     console.log("11111  ")
+      //console.log(room)
     if(player=="red"){
       player="yellow"
     }
@@ -72,7 +74,7 @@ io.on('connection', function(socket) {
       player="red"
     }
     socket.to(room).emit("turn",player);
-  });
+  });*/
 });
 
 server.listen(7777, function() {
