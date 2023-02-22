@@ -7,23 +7,25 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-var player ="yellow";
+var player ="red";
 var playersID=[];
+const Rooms=[];
+var countRooms=0
 app.set('view engine', 'ejs');
 
 // Define a route for the game page.
-app.get('/', (req, res) => {
+app.get('/game', (req, res) => {
   res.render('game.ejs');
 });
-//app.get('/', (req, res) => {
-//  res.render('index');
-//});
+app.get('/', (req, res) => {
+ res.render('index');
+});
 
-/*
+
 app.get('/game/:roomId', (req, res) => {
-  const roomId = req.params.roomId;
   
-  
+
+
   // Join the room.
   const socket = io.sockets.connected[socket.id];
   socket.join(roomId);
@@ -31,43 +33,71 @@ app.get('/game/:roomId', (req, res) => {
   // Redirect the user to the game page.
   //res.redirect('/game');
 });
-*/
+
+class Room{
+  constructor(roomName,uid=[],turn="red")
+  {
+    this.uid = uid;
+    this.roomName=roomName;
+    this.turn = turn;
+  }
+}
+
 
 io.sockets.on('connection', (socket)=>{
-  if(playersID.length<2){
-    playersID.push(socket.id)
-  }
-  socket.on("disconnect", function(socket){
-    playersID.splice(playersID.indexOf(socket.id),1)
-    console.log('User connected with ID:',playersID );
+  socket.on("mhere", function(roomName) {
+    let roomExist = false;
+    for (let i = 0; i < Rooms.length; i++) {
+      if (Rooms[i].roomName === roomName) {
+        if (Rooms[i].uid.length < 2) {
+          Rooms[i].uid.push(socket.id);
+          if (Rooms[i].uid.length==2){
+            io.to(Rooms[i].uid[1]).emit('player',"red","red",i);
+            io.to(Rooms[i].uid[0]).emit('player',"red","yellow",i);
+          }
+        }
+        roomExist = true;
+        break;
+      }
+    }
+    if (!roomExist) {
+      Rooms.push(new Room(roomName, []));
+      Rooms[Rooms.length - 1].uid.push(socket.id);
+    }
+    console.log(Rooms);
+  });
+  socket.on("disconnect", function(){
+    for (let i = 0; i < Rooms.length; i++) {
+      for(let j =0;j<Rooms[i].uid.length;j++)
+        if (Rooms[i].uid[j]=== socket.id) {
+          Rooms[i].uid.splice(Rooms[i].uid.indexOf(socket.id),1)
+          break;
+        }
+    }
   })
-  console.log('User connected with ID:',playersID );
-  /*socket.on('joinRoom', function(roomName) {
-    console.log(roomName)
-    try{
-      console.log("joining room")
-      socket.join(roomName,()=>{
-        console.log(socket.id + " now in room " + socket.rooms + "\n")
-      })
+  
+  socket.on('joinRoom', function(roomName) {
+    var roomFull=false;
+    for (let i = 0; i < Rooms.length; i++) { 
+      if (Rooms[i].roomName === roomName) {
+        if (Rooms[i].uid.length >= 2) {
+          socket.emit("roomFull", roomName);
+          roomFull=true;
+        }
+        else{
+          socket.emit("roomJoined", roomName);
+        }
+        break;
+      }
     }
-    catch(error){
-      console.error(error)
+    if(!roomFull){
+      socket.emit("roomJoined", roomName);
     }
-    socket.emit("roomJoined", roomName);
+    
+    
     
   });
-*/  
-  socket.emit("player",(player));
-  if(player=="red"){
-    player="yellow"
-  }
-  else{
-    player="red"
-  }
-  
-  
-
-  socket.on("enter",()=>{
+  socket.on("enter",(col,row,room)=>{
     if(player=="red"){
       player="yellow"
     }
@@ -76,8 +106,15 @@ io.sockets.on('connection', (socket)=>{
     }
     console.log(player)
     //io.emit("turn",player);
-    io.to(playersID[1]).emit("turn",player);
-    io.to(playersID[0]).emit("turn",player);
+    io.to(Rooms[room].uid[0]).emit("turn",player,col,row);
+    io.to(Rooms[room].uid[1]).emit("turn",player,col,row);
+  })
+
+
+  socket.on("win",function(player,room){
+    
+    io.to(Rooms[room].uid[0]).emit("win!",player);
+    io.to(Rooms[room].uid[1]).emit("win!",player);
   })
 
   /*socket.on("endturn", function(socket){

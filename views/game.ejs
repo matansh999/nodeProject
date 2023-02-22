@@ -1,225 +1,279 @@
+
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Connect four</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <title>Connect Four</title>
     <style>
-      
-      .selector{
-        margin-left: 2.6%;
-        width: 3%;
-        background-color: black;
-        height: 5px;
+      /* Style the game board */
+      .board {
+        display: flex;
+        flex-wrap: wrap;
+        width: 750px;
+        height: 610px;
+        border: 1px solid black;
+        margin: 10px;
+        background-color: blue;
       }
-      #firstBtn{
-        margin-left: 3.9%;      
-}
+
+      /* Style the game pieces */
+      .piece {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 10px;
+        border: 1px solid black;
+        background-color: white;
+      }
+
+      /* Style the buttons */
+      .button {
+        width: 80px;
+        height: 80px;
+        margin: 10px;
+      }
+
+
+           /* Style the modal */
+           .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      /* Style the modal content */
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        text-align: center;
+      }
+
+      /* Style the close button */
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+
     </style>
   </head>
-  <body onload ="load()">
-    
-    <div>
-      <canvas id="myCanvas" ></canvas>
-      
+  <body>
+    <div class="board">
+      <!-- Create the game board using 7x7 divs with ids -->
+      <div id="col-0-row-0" class="piece"></div>
+      <div id="col-1-row-0" class="piece"></div>
+      <div id="col-2-row-0" class="piece"></div>
+      <div id="col-3-row-0" class="piece"></div>
+      <div id="col-4-row-0" class="piece"></div>
+      <div id="col-5-row-0" class="piece"></div>
+      <div id="col-6-row-0" class="piece"></div>
+      <div id="col-0-row-1" class="piece"></div>
+      <div id="col-1-row-1" class="piece"></div>
+      <div id="col-2-row-1" class="piece"></div>
+      <div id="col-3-row-1" class="piece"></div>
+      <div id="col-4-row-1" class="piece"></div>
+      <div id="col-5-row-1" class="piece"></div>
+      <div id="col-6-row-1" class="piece"></div>
+      <div id="col-0-row-2" class="piece"></div>
+      <div id="col-1-row-2" class="piece"></div>
+      <div id="col-2-row-2" class="piece"></div>
+      <div id="col-3-row-2" class="piece"></div>
+      <div id="col-4-row-2" class="piece"></div>
+      <div id="col-5-row-2" class="piece"></div>
+      <div id="col-6-row-2" class="piece"></div>
+      <div id="col-0-row-3" class="piece"></div>
+      <div id="col-1-row-3" class="piece"></div>
+      <div id="col-2-row-3" class="piece"></div>
+      <div id="col-3-row-3" class="piece"></div>
+      <div id="col-4-row-3" class="piece"></div>
+      <div id="col-5-row-3" class="piece"></div>
+      <div id="col-6-row-3" class="piece"></div>
+      <div id="col-0-row-4" class="piece"></div>
+      <div id="col-1-row-4" class="piece"></div>
+      <div id="col-2-row-4" class="piece"></div>
+      <div id="col-3-row-4" class="piece"></div>
+      <div id="col-4-row-4" class="piece"></div>
+      <div id="col-5-row-4" class="piece"></div>
+      <div id="col-6-row-4" class="piece"></div>
+      <div id="col-0-row-5" class="piece"></div>
+      <div id="col-1-row-5" class="piece"></div>
+      <div id="col-2-row-5" class="piece"></div>
+      <div id="col-3-row-5" class="piece"></div>
+      <div id="col-4-row-5" class="piece"></div>
+      <div id="col-5-row-5" class="piece"></div>
+      <div id="col-6-row-5" class="piece"></div>
+    </div>
+    <!-- Create buttons below each column -->
+    <div class="buttons">
+      <button id="0" class="button">Drop</button>
+      <button id="1" class="button">Drop</button>
+      <button id="2" class="button">Drop</button>
+      <button id="3" class="button">Drop</button>
+      <button id="4" class="button">Drop</button>
+      <button id="5" class="button">Drop</button>
+      <button id="6" class="button">Drop</button>
+    </div>
+
+
+<div>
+  <h2 id = "turn"></h2>
+  <h2 id = "player"></h2>
+</div>
+
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <p id="winner"></p>
+  </div>
+</div>
+
+
+
+
+
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <script>
-      const canvas = document.getElementById('myCanvas');                         
-      const ctx = canvas.getContext('2d');
-      var elemLeft = canvas.offsetLeft + canvas.clientLeft;
-      var elemTop = canvas.offsetTop + canvas.clientTop;
-      var elements=[];
-      var btnArr = [];
-      var player, turn="red", room;
-      
-      
-      var socket = io();
-      
-      socket.on('player', function(p) {
-        player=p;
-        console.log(player);
-        draw()
-      });
-      
-      //
-      socket.on('roomJoined', function(x) {
-      });
-
-      const params = new URL(document.location).searchParams;
-      room = params.get('room')
-      
-      const x = 7
-      const y = 7
-      document.getElementById("myCanvas",(canvas)=>
-        {
-          console.log("<-!->")
-          canvas.width=window.innerWidth;
-          canvas.height=window.innerHeight;
-        })
-      function load(){
-        draw()
-        document.getElementById("myCanvas").width=window.innerWidth/2;
-        document.getElementById("myCanvas").height=document.getElementById("myCanvas").width/1.5;
-        var Btns=document.getElementsByClassName('selector');
-        for(let i=0; i<Btns.length;i++){
-          Btns[i].size=window.innerWidth/2
-        }
-      }
-          
-      window.addEventListener('resize',()=>
-      {
-        document.getElementById("myCanvas").width=window.innerWidth/2;
-        document.getElementById("myCanvas").height=document.getElementById("myCanvas").width/1.5;
-        draw();        
-      },false)
+const modal = document.getElementById("myModal");
+const winnerEl = document.getElementById("winner");
+var player, turn;
+var elements=[];
+const params = new URL(document.location).searchParams;
+var room = params.get('room')
 
 
-      
-    for (var j=0;j<x;j++){
-      elements.push([]);
-    }
-    //console.log(elements)
-      //circles
-    elements.forEach((element)=>{
-      for(let k=0;k<y;k++)
-      { 
-        element.push({
-          color: '#05EFFF',
-          player: 0,
-          neighborLeft:0,
-          neighborRight:0,
-          neighborLeftUp:0,
-          neighborLeftDown:0,
-          neighborRightUp:0,
-          neighborRightDown:0,
-          neighborDown:0,
-
-        });
-      }
-    });
-      
-    
-
-  
-    //tringles
-    let tringles=[]
-    for (let jj=0;jj<=6 ;jj++)
-    {
-      tringles.push({
-        color:'#red',
-        top:(canvas.height/7)*6,
-        left:canvas.width/9,
-      })
-    }
-    elements.push(tringles)
-    //console.log(elements)
-
-
-
-
-function draw()
-{
-  console.log(elements)
-  ctx.fillStyle = "black"
-  ctx.fillRect(0,0,canvas.width,canvas.height)
-  var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
-  var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
-  let elementCount=0;
-  elements.forEach(function(elementss) {
-    //console.log(elementss)
-    elementss.forEach((element)=>{
-      
-      //console.log(element.color+" "+ctx.fillStyle)
-      ctx.beginPath();
-      ctx.arc((w*1.25)*((elementCount%7)+1),(Math.floor(elementCount/8)+1)*(b),w/5,0,2 * Math.PI);
-      ctx.fillStyle = element.color;
-      console.log(ctx.fillStyle)
-      ctx.fill()
-      elementCount++;
-    })
-  });
-  
-  for (let i =0;i<7;i++)
-  {
-    let topPoint=(w*1.25)*(i+1)
-    let rightPoint=(w*1.25)*(i+1)+(w*1.25-w)
-    let leftPoint=(w*1.25)*(i+1)-(w*1.25-w)
-    ctx.fillStyle=player
-    ctx.beginPath()
-    ctx.moveTo(rightPoint,(b*8.5))
-    ctx.lineTo(topPoint,(b*8))
-    ctx.lineTo(leftPoint,(b*8.5))
-    ctx.fill()
-    btnArr[i]={"col":i,"topPoint":topPoint,"rightPoint":rightPoint,"leftPoint":leftPoint,"lowY":b*8,"heighY":b*8.5}
-    //console.log(" i: " + (i+1), " 1: " + ((((w/9)*(i+2)))*(10)) + " 2: " + ((((w/9)*(i+2)))*(10)+dis) + " 3: " +((((w/9)*(i+2)))*(10)+2*dis) +  " w = " + w + " dis: " + dis+" w/9: "+ w/9)
-  }
-}  
-
-// " 1: " + w*1.25*(i+1) + " 2: " + (w*1.5)*(i+1) + " 3: " +(w*1.75)*(i+1) +  " w = " + w 
-
-
-
-// Add event listener for `click` events.
-
-socket.on('turn',(p)=>{
-  turn=p;
-  console.log("the turn is of player:"+p)
+var socket = io();
+console.log(room)
+socket.emit("mhere",room)
+socket.on('player', function(t,p,r) {
+  player=p;
+  console.log(player);
+  document.getElementById("player").innerHTML=`Player is ${player}`
+  turn=t;
+  document.getElementById("turn").innerHTML=`turn is of player ${turn}`
+  console.log("the turn is of player:"+turn)
+  room=r
 });
 
-canvas.addEventListener('click',function(event){
-  console.log(turn + " " + player)
-  if(turn===player){
-    
-    //console.log(btnArr)
-    var choose = false
-    var  target
-    var x = event.pageX  - elemLeft,
-        y = event.pageY  - elemTop;
-    //console.log("x =  ",x,"y =  ",y)
-    // Collision detection between clicked offset and element.
-    const slope = (btnArr[1].heighY-btnArr[1].lowY)/(btnArr[1].topPoint-btnArr[1].leftPoint)
-    //console.log(slope)
-    
-    btnArr.forEach(function(btn) {
-      if((x<=btn.rightPoint&&x>=btn.topPoint)&&(y<=slope*(x-btn.topPoint)+btn.heighY&&(y>=btn.lowY)) || (x<=btn.topPoint&&x>=btn.leftPoint)&&(y<=((-slope)*(x-btn.topPoint)+btn.heighY))&&(y>=btn.lowY))
+//
+socket.on('roomJoined', function(x) {
+});
+
+socket.on('turn',(p,col,row)=>{
+  if(turn!=null){ 
+    turn=p
+    if(p=="red"){
+      document.getElementById(`col-${col}-row-${row}`).style.backgroundColor="yellow";
+      elements[col][row].player="yellow"
+    }
+    else{
+      document.getElementById(`col-${col}-row-${row}`).style.backgroundColor="red";
+      elements[col][row].player="red"
+    }
+    document.getElementById("turn").innerHTML=`turn is of player ${turn}`
+  }
+});
+
+
+  
+for (var j=0;j<7;j++){
+  elements.push([]);
+}
+//console.log(elements)
+//circles
+elements.forEach((element)=>{
+  for(let k=0;k<6;k++)
+  { 
+    element.push({
+      player: "none",
+      neighborLeft:0,
+      neighborRight:0,
+      neighborLeftUp:0,
+      neighborLeftDown:0,
+      neighborRightUp:0,
+      neighborRightDown:0,
+      neighborDown:0,
+    });
+  }
+});
+
+
+
+function pressed(input,player){
+  if(turn === player){
+    for (let coli=0;coli<7;coli++)
+    {
+      for (let rowi=5;rowi>0;rowi--)
       {
-        for(let i=6;i>0;i--)
+        if (elements[coli][rowi].player==player)
         {
-          if(elements[i][btn.col].player==0)
-          {
-            elements[i][btn.col].player=player
-            choose=true;
-            target={"col":btn.col,"row":i}
-            break;
-          }
+          checkNeighbor(coli,rowi)
         }
       }
-    });
-
-    
-    if (choose)
-    {
-      choose=false
-      elements[target.row][target.col].color=player
-      draw()
     }
-    enturn()
+    for(let i = 5; i>=0;i--){
+      if(elements[input][i].player=="none"){
+        elements[input][i].player=player;
+        document.getElementById(`col-${input}-row-${i}`).style.backgroundColor=player;
+        checkNeighbor(input,i)
+        socket.emit("enter",input,i,room);
+        break;
+      }
+    }
+  }
   
-}},false,)
-
-
-      
-
-
-
-
-
-function enturn()
-{
-  socket.emit("enter");
-  //socket.emit("endturn");
 }
 
+document.getElementById("0").addEventListener("click", function() {
+  pressed(0, player);
+});
+
+document.getElementById("1").addEventListener("click", function() {
+  pressed(1, player);
+});
+
+document.getElementById("2").addEventListener("click", function() {
+  pressed(2, player);
+});
+
+document.getElementById("3").addEventListener("click", function() {
+  pressed(3, player);
+});
+
+document.getElementById("4").addEventListener("click", function() {
+  pressed(4, player);
+});
+
+document.getElementById("5").addEventListener("click", function() {
+  pressed(5, player);
+});
+
+document.getElementById("6").addEventListener("click", function() {
+  pressed(6, player);
+});
 
 
 
@@ -228,83 +282,94 @@ function enturn()
 
 
 
-      draw();
 
 
 
 
 
-      function checkNeighbor(i,j,circ)
-      {
-        if(i>0&&elements[i-1][j].player==circ.player){
-          circ.neighborDown=elements[i-1][j].neighborDown+1
-          if(circ.neighborDown==4){
-            win()
-          }
-        }
-        
-        if(j>0&&elements[i][j-1].player==circ.player){
-          circ.neighborLeft=elements[i][j-1].neighborLeft+1
-          if(circ.neighborLeft==4){
-            win()
-          }
-        }
 
-        if(j<6&&elements[i][j+1].player==circ.player){
-          circ.neighborRight=elements[i][j+1].neighborRight+1
-          if(circ.neighborRight==4){
-            win()
-          }
-        }
 
-        if(i>0&&j>0&&elements[i-1][j-1].player==circ.player){
-          circ.neighborLeftDown=elements[i-1][j-1].neighborLeftDown+1
-          if(circ.neighborLeftDown==4){
-            win()
-          }
-        }
-        
-        if(i<6&&j>0&&elements[i+1][j-1].player==circ.player){
-          circ.neighborLeftUp=elements[i+1][j-1].neighborLeftUp+1
-          if(circ.neighborLeftUp==4){
-            win()
-          }
-        }
 
-        if(i>0&&j>0&&elements[i+1][j+1].player==circ.player){
-          circ.neighborRightUp=elements[i+1][j+1].neighborRightUp+1
-          if(circ.neighborRightUp==4){
-            win()
-          }
-        }
 
-        if(i>0&&j>0&&elements[i-1][j+1].player==circ.player){
-          circ.neighborRightDown=elements[i-1][j+1].neighborRightDown+1
-          if(circ.neighborRightDown==4){
-            win()
-          }
-        }
-      }
-function win()
-    {
-      console.log("winn ")
+
+
+
+
+function checkNeighbor(col,row)
+{
+  circ=elements[col][row];
+  if(row<5&&elements[col][row+1].player==circ.player){
+    circ.neighborDown=elements[col][row+1].neighborDown+1
+    if(circ.neighborDown==3){
+      win()
     }
+  }
+  
+  if(col>0&&elements[col-1][row].player==circ.player){
+    circ.neighborLeft=elements[col-1][row].neighborLeft+1
+    if(circ.neighborLeft==3){
+      win()
+    }
+  }
 
+  if(col<6&&elements[col+1][row].player==circ.player){
+    circ.neighborRight=elements[col+1][row].neighborRight+1
+    if(circ.neighborRight==3){
+      win()
+    }
+  }
 
+  if(col>0&&row<5&&elements[col-1][row+1].player==circ.player){
+    circ.neighborLeftDown=elements[col-1][row+1].neighborLeftDown+1
+    if(circ.neighborLeftDown==3){
+      win()
+    }
+  }
+  
+  if(row>0&&col>0&&elements[col-1][row-1].player==circ.player){
+    circ.neighborLeftUp=elements[col-1][row-1].neighborLeftUp+1
+    if(circ.neighborLeftUp==3){
+      win()
+    }
+  }
 
+  if(col<6&&row>0&&elements[col+1][row-1].player==circ.player){
+    circ.neighborRightUp=elements[col+1][row-1].neighborRightUp+1
+    if(circ.neighborRightUp==3){
+      win()
+    }
+  }
 
+  if(col<6&&j<5&&elements[col+1][row+1].player==circ.player){
+    circ.neighborRightDown=elements[col+1][row+1].neighborRightDown+1
+    if(circ.neighborRightDown==3){
+      win()
+    }
+  }
+  if((circ.neighborLeft+circ.neighborRight>=3)||(circ.neighborLeftUp+circ.neighborRightDown>=3)||(circ.neighborLeftDown+circ.neighborRightUp>=3)){
+    win()
+  }
+}
 
+function win()
+{
+  socket.emit("win",player,room)
+}
 
-
-
-
-
-
-
-
-
-
+socket.on("win!",function(color){
+  //alert(`${color} player is the winner`)
+  openModal(color);
       
+      function openModal(color) {
+        winnerEl.textContent = `${color} is the winner`;
+        modal.style.display = "block";
+      }
+      // Close the modal
+      function closeModal() {
+        modal.style.display = "none";
+      }
+})
+
     </script>
   </body>
 </html>

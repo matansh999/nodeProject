@@ -12,9 +12,11 @@
       }
 
       socket.on("roomJoined", function(roomName) {
-        console.log("Joined room: " + roomName);
         window.location="game?room="+roomName;
       });
+      socket.on("roomFull",(roomName)=>{
+        alert(`the room: ${roomName} is full please enter a different room`)
+      })
     </script>
   </head>
   <body>
