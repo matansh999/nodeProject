@@ -340,7 +340,7 @@ function checkNeighbor(col,row)
     }
   }
 
-  if(col<6&&j<5&&elements[col+1][row+1].player==circ.player){
+  if(col<6&&row<5&&elements[col+1][row+1].player==circ.player){
     circ.neighborRightDown=elements[col+1][row+1].neighborRightDown+1
     if(circ.neighborRightDown==3){
       win()
