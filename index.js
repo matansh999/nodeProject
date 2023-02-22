@@ -1,21 +1,23 @@
 const express = require('express');
 const http = require('http');
+const { disconnect } = require('process');
 const socketio = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-var player ="red";
+var player ="yellow";
+var playersID=[];
 app.set('view engine', 'ejs');
 
 // Define a route for the game page.
-app.get('/game', (req, res) => {
+app.get('/', (req, res) => {
   res.render('game.ejs');
 });
-app.get('/', (req, res) => {
-  res.render('index');
-});
+//app.get('/', (req, res) => {
+//  res.render('index');
+//});
 
 /*
 app.get('/game/:roomId', (req, res) => {
@@ -31,17 +33,30 @@ app.get('/game/:roomId', (req, res) => {
 });
 */
 
-io.on('connection', socket=>{
-  console.log('User connected with ID:', socket.id);
-  socket.on('joinRoom', function(roomName) {
+io.sockets.on('connection', (socket)=>{
+  if(playersID.length<2){
+    playersID.push(socket.id)
+  }
+  socket.on("disconnect", function(socket){
+    playersID.splice(playersID.indexOf(socket.id),1)
+    console.log('User connected with ID:',playersID );
+  })
+  console.log('User connected with ID:',playersID );
+  /*socket.on('joinRoom', function(roomName) {
     console.log(roomName)
-    socket.join(roomName);
+    try{
+      console.log("joining room")
+      socket.join(roomName,()=>{
+        console.log(socket.id + " now in room " + socket.rooms + "\n")
+      })
+    }
+    catch(error){
+      console.error(error)
+    }
     socket.emit("roomJoined", roomName);
+    
   });
-  
-
-  
-  
+*/  
   socket.emit("player",(player));
   if(player=="red"){
     player="yellow"
@@ -49,10 +64,10 @@ io.on('connection', socket=>{
   else{
     player="red"
   }
-
+  
   
 
-  socket.on("enter",(room)=>{
+  socket.on("enter",()=>{
     if(player=="red"){
       player="yellow"
     }
@@ -60,8 +75,9 @@ io.on('connection', socket=>{
       player="red"
     }
     console.log(player)
-    console.log(room)
-    io.to(room).emit("turn",player);
+    //io.emit("turn",player);
+    io.to(playersID[1]).emit("turn",player);
+    io.to(playersID[0]).emit("turn",player);
   })
 
   /*socket.on("endturn", function(socket){

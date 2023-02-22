@@ -28,28 +28,26 @@
       const ctx = canvas.getContext('2d');
       var elemLeft = canvas.offsetLeft + canvas.clientLeft;
       var elemTop = canvas.offsetTop + canvas.clientTop;
-      var elements = [];
+      var elements=[];
       var btnArr = [];
       var player, turn="red", room;
       
-
+      
       var socket = io();
       
       socket.on('player', function(p) {
         player=p;
         console.log(player);
+        draw()
       });
-      socket.on("turn",(p)=>{
-        turn=p;
-        console.log(p)
+      
+      //
+      socket.on('roomJoined', function(x) {
       });
-
-
 
       const params = new URL(document.location).searchParams;
       room = params.get('room')
-
-
+      
       const x = 7
       const y = 7
       document.getElementById("myCanvas",(canvas)=>
@@ -59,9 +57,9 @@
           canvas.height=window.innerHeight;
         })
       function load(){
+        draw()
         document.getElementById("myCanvas").width=window.innerWidth/2;
         document.getElementById("myCanvas").height=document.getElementById("myCanvas").width/1.5;
-        draw();
         var Btns=document.getElementsByClassName('selector');
         for(let i=0; i<Btns.length;i++){
           Btns[i].size=window.innerWidth/2
@@ -77,12 +75,15 @@
 
 
       
-
-      //circles
     for (var j=0;j<x;j++){
+      elements.push([]);
+    }
+    //console.log(elements)
+      //circles
+    elements.forEach((element)=>{
       for(let k=0;k<y;k++)
       { 
-        elements.push({
+        element.push({
           color: '#05EFFF',
           player: 0,
           neighborLeft:0,
@@ -91,49 +92,59 @@
           neighborLeftDown:0,
           neighborRightUp:0,
           neighborRightDown:0,
-          neighborDown:0
+          neighborDown:0,
+
         });
       }
-    }
+    });
+      
+    
 
-
+  
     //tringles
-    for (let jj=0;jj<6 ;jj++)
+    let tringles=[]
+    for (let jj=0;jj<=6 ;jj++)
     {
-      elements.push({
+      tringles.push({
         color:'#red',
         top:(canvas.height/7)*6,
         left:canvas.width/9,
       })
     }
+    elements.push(tringles)
+    //console.log(elements)
 
 
 
 
 function draw()
 {
+  console.log(elements)
   ctx.fillStyle = "black"
   ctx.fillRect(0,0,canvas.width,canvas.height)
   var w=document.getElementById("myCanvas").width/(1.56*x) // w = x
   var b=document.getElementById("myCanvas").height/(1.25*y) // b = y cord
   let elementCount=0;
-  elements.forEach(function(element) {
-    ctx.beginPath();
-    ctx.arc((w*1.25)*((elementCount%7)+1),(Math.floor(elementCount/8)+1)*(b),w/5,0,2 * Math.PI);
-    ctx.fillStyle = element.color;
-    ctx.fill()
-    elementCount++;
+  elements.forEach(function(elementss) {
+    //console.log(elementss)
+    elementss.forEach((element)=>{
+      
+      //console.log(element.color+" "+ctx.fillStyle)
+      ctx.beginPath();
+      ctx.arc((w*1.25)*((elementCount%7)+1),(Math.floor(elementCount/8)+1)*(b),w/5,0,2 * Math.PI);
+      ctx.fillStyle = element.color;
+      console.log(ctx.fillStyle)
+      ctx.fill()
+      elementCount++;
+    })
   });
-  ctx.beginPath()
-    ctx.moveTo(w,(b*8.5))
-    ctx.lineTo(w*1.25,(b*8))
-    ctx.lineTo(w*1.5,(b*8.5))
-    ctx.fill()
+  
   for (let i =0;i<7;i++)
   {
     let topPoint=(w*1.25)*(i+1)
     let rightPoint=(w*1.25)*(i+1)+(w*1.25-w)
     let leftPoint=(w*1.25)*(i+1)-(w*1.25-w)
+    ctx.fillStyle=player
     ctx.beginPath()
     ctx.moveTo(rightPoint,(b*8.5))
     ctx.lineTo(topPoint,(b*8))
@@ -150,52 +161,49 @@ function draw()
 
 // Add event listener for `click` events.
 
- 
+socket.on('turn',(p)=>{
+  turn=p;
+  console.log("the turn is of player:"+p)
+});
+
 canvas.addEventListener('click',function(event){
   console.log(turn + " " + player)
   if(turn===player){
-    enturn()
-    console.log(btnArr)
+    
+    //console.log(btnArr)
     var choose = false
-    var i = 0, target
+    var  target
     var x = event.pageX  - elemLeft,
         y = event.pageY  - elemTop;
-    console.log("x =  ",x,"y =  ",y)
+    //console.log("x =  ",x,"y =  ",y)
     // Collision detection between clicked offset and element.
     const slope = (btnArr[1].heighY-btnArr[1].lowY)/(btnArr[1].topPoint-btnArr[1].leftPoint)
     //console.log(slope)
-    /*
+    
     btnArr.forEach(function(btn) {
-      if((x<=btn.rightPoint&&x>=btn.topPoint)&&(y<=slope*(x-btn.topPoint)+btn.heighY&&(y>=btn.lowY)))
+      if((x<=btn.rightPoint&&x>=btn.topPoint)&&(y<=slope*(x-btn.topPoint)+btn.heighY&&(y>=btn.lowY)) || (x<=btn.topPoint&&x>=btn.leftPoint)&&(y<=((-slope)*(x-btn.topPoint)+btn.heighY))&&(y>=btn.lowY))
       {
-        for(let p=6;p>0;p--)
+        for(let i=6;i>0;i--)
         {
-          if(elements[p][btn.col].player==0)
+          if(elements[i][btn.col].player==0)
           {
-            elements[p][btn.col].player=player
+            elements[i][btn.col].player=player
+            choose=true;
+            target={"col":btn.col,"row":i}
             break;
           }
         }
       }
-      else if( (x<=btn.topPoint&&x>=btn.leftPoint)&&(y<=((-slope)*(x-btn.topPoint)+btn.heighY))&&(y>=btn.lowY) )
-      {
-        //console.log(btn)
-      }
-    });*/
+    });
 
     
-
     if (choose)
     {
       choose=false
-      console.log(elements[target])
-      if (elements[target].color=='#05EFFF')
-      {
-        elements[target].color=player
-      }
-      console.log(elements[target])
+      elements[target.row][target.col].color=player
       draw()
     }
+    enturn()
   
 }},false,)
 
@@ -208,8 +216,7 @@ canvas.addEventListener('click',function(event){
 
 function enturn()
 {
-  console.log(room)
-  socket.emit("enter",room);
+  socket.emit("enter");
   //socket.emit("endturn");
 }
 
