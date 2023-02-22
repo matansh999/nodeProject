@@ -360,15 +360,16 @@ socket.on("win!",function(color){
   //alert(`${color} player is the winner`)
   openModal(color);
       
-      function openModal(color) {
+      
+})
+function openModal(color) {
         winnerEl.textContent = `${color} is the winner`;
         modal.style.display = "block";
       }
-      // Close the modal
-      function closeModal() {
-        modal.style.display = "none";
-      }
-})
+// Close the modal
+function closeModal() {
+  modal.style.display = "none";
+}
 
     </script>
   </body>
