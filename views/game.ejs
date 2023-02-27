@@ -202,8 +202,7 @@ socket.on('turn',(p,col,row)=>{
 for (var j=0;j<7;j++){
   elements.push([]);
 }
-//console.log(elements)
-//circles
+
 elements.forEach((element)=>{
   for(let k=0;k<6;k++)
   { 
@@ -359,8 +358,6 @@ function win()
 socket.on("win!",function(color){
   //alert(`${color} player is the winner`)
   openModal(color);
-      
-      
 })
 function openModal(color) {
         winnerEl.textContent = `${color} is the winner`;
@@ -369,8 +366,33 @@ function openModal(color) {
 // Close the modal
 function closeModal() {
   modal.style.display = "none";
+  window.location='/'
 }
 
+socket.on("restart",function(){
+  player=null
+  
+})
+function reset()
+{
+  /*closeModal()
+  for (let coli = 0;coli<7;coli++)
+  {
+    for (let rowi=0;rowi<6;rowi++)
+    {
+      document.getElementById(`col-${coli}-row-${rowi}`).style.backgroundColor="white"
+      elements[coli][rowi].player= "none";
+      elements[coli][rowi].neighborLeft=0;
+      elements[coli][rowi].neighborRight=0;
+      elements[coli][rowi].neighborLeftUp=0;
+      elements[coli][rowi].neighborLeftDown=0;
+      elements[coli][rowi].neighborRightUp=0;
+      elements[coli][rowi].neighborRightDown=0;
+      elements[coli][rowi].neighborDown=0;
+    }
+  }*/
+  
+}
     </script>
   </body>
 </html>

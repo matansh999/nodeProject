@@ -31,7 +31,6 @@ app.get('/game/:roomId', (req, res) => {
   socket.join(roomId);
   
   // Redirect the user to the game page.
-  //res.redirect('/game');
 });
 
 class Room{
@@ -117,17 +116,10 @@ io.sockets.on('connection', (socket)=>{
     io.to(Rooms[room].uid[1]).emit("win!",player);
   })
 
-  /*socket.on("endturn", function(socket){
-    console.log("11111  ")
-      //console.log(room)
-    if(player=="red"){
-      player="yellow"
-    }
-    else{
-      player="red"
-    }
-    socket.to(room).emit("turn",player);
-  });*/
+  socket.on("reset",function(player,room){
+    io.to(Rooms[room].uid[0]).emit("restart",player);
+    io.to(Rooms[room].uid[1]).emit("restart",player);
+  });
 });
 
 server.listen(7777, function() {
